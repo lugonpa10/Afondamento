@@ -34,40 +34,25 @@ def rango():
          print(f"{num2} es mayor que {num1} y la suma de todos los numeros entre ellos es {cont}\n")
             
 def listas():
-     tamanho =int(input("Dime el tamaño para la lista 1: "))
-     lista1=[]
-     tamanho =int(input("Dime el tamaño para la lista 2: "))
-     lista2=[]
+     tamanho =int(input("Dime el tamaño para las listas: "))
+     lista1 =[random.randint(1,50) for i in range(tamanho)]
+     lista2 =[random.randint(1,50) for i in range(tamanho)]
 
-     for _ in range(tamanho):
-          
-          
-          
+     print("Lista 1: \n",lista1)
+     print("Lista 2: \n",lista2)
 
-   
-
-    
+     sumalistas = [lista1[i] + lista2[i] for i in range(tamanho)]
+     print("La suma es: ",sumalistas)
 
 
 
-    
-    
-            
-              
-    
-         
 
 
-         
-   
 
-
-         
-     
-     
      
 
-
+     
+          
 
 
 
@@ -84,6 +69,7 @@ elif opcion == 2:
 elif opcion == 3:
      rango()
 elif opcion == 4:
+     listas()
      
      
      
