@@ -17,7 +17,7 @@ def contar_palabras(texto):
     return diccionario
 
 def estadisticas_texto(texto):
-    diccionario = {}
+    diccionario = contar_palabras(texto)
     signos = ["¡", "!", "¿", "?", ".", ",", ";", ":", "(", ")", "\"", "'"]
     
     palabraLarga = ""
@@ -33,13 +33,14 @@ def estadisticas_texto(texto):
     
     palabras = texto.split()
 
-    num_palabras = len(palabras) # palabras totales
+    num_palabras =  len(palabras) # palabras totales
+
    
     
     for palabra in palabras: # media palabras
          sumaLongitudes+= len(palabra)
 
-    mediaPalabras = sumaLongitudes / len(palabras)
+    mediaPalabras =  sumaLongitudes / len(palabras)
     
     
     for palabra in palabras: # palabra mas larga
@@ -51,7 +52,32 @@ def estadisticas_texto(texto):
             max_frecuencia = frecuencia
             palabra_frecuente = palabra
 
-    return(num_palabras,mediaPalabras,palabraLarga, palabra_frecuente)
+    return(
+        ("Numero total de palabras",num_palabras),
+        ("Longitud media",mediaPalabras),
+        ("La palabra mas larga es ",palabraLarga),
+        ("Palabra mas frecuente ", palabra_frecuente)
+        )
+
+
+archivo = input("Introduce el nombre de un archivo: ")
+
+with open(archivo,"r") as archivo_lectura:
+    texto = archivo_lectura.read()
+
+frecuencias = contar_palabras(texto)
+
+for palabra, frecuencia in frecuencias.items():
+    print(f"{palabra:<15}: {frecuencia}")
+
+print()
+
+for tag,valor in estadisticas_texto(texto):
+    print(f"{tag}:{valor}")
+
+
+
+
 
 
 
