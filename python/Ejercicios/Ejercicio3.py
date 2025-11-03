@@ -43,7 +43,7 @@ def pide_libro():
             else:
                 print("Isbn No valido")
         except ValueError:
-             print("Debe ingresar un ISBN")
+             print("Debe ingresar un ISBN: ")
 
     num_pag = pide_entero_positivo()
 
@@ -75,7 +75,7 @@ while opcion != 4:
     print("2.Mostrar Lista")
     print("3.Eliminar un libro")
     print("4.Salir y guardar datos")
-    opcion = int(input("Elige una Opcion"))
+    opcion = int(input("Elige una Opcion: "))
 
     if opcion == 1:
         libro = pide_libro()
@@ -86,7 +86,7 @@ while opcion != 4:
             titulo,autor,isbn,num_pag = libro
             print(f"{titulo:<20} {autor:<20} {isbn:<20} {num_pag:<20}")
     if opcion == 3:
-        titulo_borrar = input("Introduce el titulo del libro a eliminar")
+        titulo_borrar = input("Introduce el titulo del libro a eliminar: ")
 
         titulo = False
 

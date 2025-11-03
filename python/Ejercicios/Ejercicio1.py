@@ -45,31 +45,25 @@ def listas():
      print("La suma es: ",sumalistas)
 
 
+opcion = 0
+while opcion != 5:
+     print("1-Division con decimales")
+     print("2-Potencia")
+     print("3-Rango")
+     print("4-Listas")
+     print("5-Salir")
+     opcion = int(input("Introduce una opcion: "))
 
-
-
-
-     
-
-     
-          
-
-
-
-print("1-Division con decimales")
-print("2-Potencia")
-print("3-Rango")
-print("4-Listas")
-opcion = int(input("Introduce una opcion: "))
-
-if opcion == 1:
-      divisiones()
-elif opcion == 2:
-     potencia()
-elif opcion == 3:
-     rango()
-elif opcion == 4:
-     listas()
+     if opcion == 1:
+          divisiones()
+     elif opcion == 2:
+          potencia()
+     elif opcion == 3:
+          rango()
+     elif opcion == 4:
+          listas()
+     elif opcion == 5:
+          print("Saliendo..")
      
      
      
