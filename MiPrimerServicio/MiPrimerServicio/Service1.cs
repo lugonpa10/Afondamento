@@ -16,6 +16,16 @@ namespace MiPrimerServicio
         public MiPrimerServicio()
         {
             InitializeComponent();
+            string nombre = "MiPrimerServicio"; // Nombre de la fuente de eventos.
+            string logDestino = "Application"; // Log del visor de eventos donde aparece
+                                               // Si es la primera vez que se escribe hay que crear
+                                               // la fuente del mensaje (internamente es un diccionario)
+            if (!EventLog.SourceExists(nombre))
+            {
+                // Requiere permisos de administrador que daremos
+                // durante la instalación del servicio
+                EventLog.CreateEventSource(nombre, logDestino);
+            }
         }
         public void WriteEvent(string mensaje)
         {
