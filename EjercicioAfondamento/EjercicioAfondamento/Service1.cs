@@ -48,7 +48,7 @@ namespace EjercicioAfondamento
 
         }
 
-       
+
         public bool ServerRunning { set; get; } = true;
         public int Port { set; get; } = 135;
         public int[] puertosAlternativos = { 135, 135, 135, 31416 };
@@ -126,7 +126,7 @@ namespace EjercicioAfondamento
                 {
                     sw.AutoFlush = true;
 
-                    string? opcion = "";
+                    string opcion = "";
                     sw.WriteLine("Bienvenido a mi servidor,introduce un comando");
                     {
                         try
@@ -145,7 +145,7 @@ namespace EjercicioAfondamento
                                         contraseñaCorrecta = sr2.ReadLine().Trim();
 
                                     }
-                                    string[] contraseña = opcion.Split(" ");
+                                    string[] contraseña = opcion.Split(' ');
 
                                     if (contraseña.Length < 2)
                                     {
@@ -214,6 +214,63 @@ namespace EjercicioAfondamento
                 }
             }
         }
-    }
+
+        public void StopServer()
+        {
+            Console.WriteLine("Deteniendo servidor");
+            ServerRunning = false;
+            s.Close();
+
+        }
+
+        public int leerPuerto()
+        {
+            string programdata = Environment.GetEnvironmentVariable("programdata");
+            string archivo = "puertos.txt";
+            string rutaArchivo = programdata + "\\" + archivo;
+            int puertoDefecto = 31416;
+            int puertoMaximo = IPEndPoint.MaxPort;
+            try
+            {
+                string linea = "";
+                using (StreamReader sr = new StreamReader(rutaArchivo))
+                {
+                    linea = sr.ReadLine()?.Trim();
+                    if (linea != null && int.TryParse(linea, out int puerto))
+                    {
+                        if (puerto > puertoMaximo || puerto < 0)
+                        {
+                            WriteEvent("Puerto no valido");
+                            return puertoDefecto;
+                        }
+                        else
+                        {
+                            WriteEvent($"El puerto {puerto} esta libre ");
+                            return puerto;
+                        }
+                    }
+                    else
+                    {
+                        WriteEvent("Ocurrio un error con el archivo");
+                        return puertoDefecto;
+                    }
+
+
+                }
+
+
+
+
+            }
+            catch (FileNotFoundException e)
+            {
+                return puertoDefecto;
+            }
+            catch (IOException e)
+            {
+                return puertoDefecto;
+            }
+        }
     }
 }
+

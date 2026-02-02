@@ -31,7 +31,8 @@
             // 
             // ServidorAfondamento
             // 
-            this.ServiceName = "Service1";
+            this.AutoLog = false;
+            this.ServiceName = "ServidorAfondamento";
 
         }
 
