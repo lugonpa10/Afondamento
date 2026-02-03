@@ -16,6 +16,12 @@ namespace EjercicioAfondamento
 {
     public partial class ServidorAfondamento : ServiceBase
     {
+        public bool ServerRunning { set; get; } = true;
+        public int Port { set; get; } = 135;
+        public int[] puertosAlternativos = { 135, 135, 135, 31416 };
+        public bool puertoOcupado = true;
+        private Socket s;
+        private int i = 0;
         public ServidorAfondamento()
         {
             InitializeComponent();
@@ -30,6 +36,7 @@ namespace EjercicioAfondamento
         public void WriteEvent(string mensaje)
         {
             const string nombre = "ServidorAfondamento";
+
             EventLog.WriteEntry(nombre, mensaje);
         }
 
@@ -45,39 +52,22 @@ namespace EjercicioAfondamento
         protected override void OnStop()
         {
             WriteEvent("Deteniendo el servidor");
+            ServerRunning = false;
 
         }
 
 
-        public bool ServerRunning { set; get; } = true;
-        public int Port { set; get; } = 135;
-        public int[] puertosAlternativos = { 135, 135, 135, 31416 };
-        public bool puertoOcupado = true;
-        private Socket s;
-        private int i = 0;
 
         public void initServer()
         {
+
+            Port = leerPuerto();
             IPEndPoint ie = new IPEndPoint(IPAddress.Any, Port);
             s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             try
             {
-                while (puertoOcupado)
-                {
-                    try
-                    {
-                        puertoOcupado = false;
-                        s.Bind(ie);
-                    }
-                    catch (SocketException e) when (e.ErrorCode == 10048)
-                    {
-                        puertoOcupado = true;
-                        ie.Port = puertosAlternativos[i];
-                        i++;
-                    }
-
-                }
+                s.Bind(ie);
                 Console.WriteLine($"Puerto {ie.Port} libre");
 
                 s.Listen(10);
@@ -264,11 +254,31 @@ namespace EjercicioAfondamento
             }
             catch (FileNotFoundException e)
             {
+                WriteEvent($"No se encontro el archivo: {e}");
                 return puertoDefecto;
             }
             catch (IOException e)
             {
+                WriteEvent($"Error en el archivo: {e}");
                 return puertoDefecto;
+            }
+        }
+
+        public void guardarComandos(string mensaje)
+        {
+            string programData = Environment.GetEnvironmentVariable("programdata");
+            string archivo = "log.txt";
+            string rutaArchivo = programData + "\\" + archivo;
+            try
+            {
+                using (StreamWriter sw = new StreamWriter(rutaArchivo))
+                {
+                    sw.WriteLine(mensaje);
+                }
+            }
+            catch (FileNotFoundException)
+            {
+
             }
         }
     }
