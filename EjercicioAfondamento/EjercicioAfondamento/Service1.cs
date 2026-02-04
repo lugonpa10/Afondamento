@@ -17,11 +17,12 @@ namespace EjercicioAfondamento
     public partial class ServidorAfondamento : ServiceBase
     {
         public bool ServerRunning { set; get; } = true;
-        public int Port { set; get; } = 135;
-        public int[] puertosAlternativos = { 135, 135, 135, 31416 };
+        public int Port { set; get; } = 31416;
+        private int puertoDefecto = 31416;
+
         public bool puertoOcupado = true;
         private Socket s;
-        private int i = 0;
+
         public ServidorAfondamento()
         {
             InitializeComponent();
@@ -36,15 +37,22 @@ namespace EjercicioAfondamento
         public void WriteEvent(string mensaje)
         {
             const string nombre = "ServidorAfondamento";
+            try
+            {
+                EventLog.WriteEntry(nombre, mensaje);
 
-            EventLog.WriteEntry(nombre, mensaje);
+            }
+            catch (Exception)
+            {
+                string mensajeError = $"[ERROR]{DateTime.Now.ToString("G")}";
+                guardarComandos(mensajeError);
+            }
         }
 
         protected override void OnStart(string[] args)
         {
             WriteEvent("Iniciando el servidor");
-            Socket client = s.Accept();
-            Thread hilo = new Thread(() => ClientDispatcher(client));
+            Thread hilo = new Thread(initServer);
             hilo.IsBackground = true;
             hilo.Start();
         }
@@ -57,15 +65,6 @@ namespace EjercicioAfondamento
         }
 
 
-<<<<<<< HEAD
-        public bool ServerRunning { set; get; } = true;
-        public int Port { set; get; } = 135;
-        public int[] puertosAlternativos = { 135, 135, 135, 31416 };
-        public bool puertoOcupado = true;
-        private Socket s;
-        private int i = 0;
-=======
->>>>>>> e542848d405e8d351c028364ab3d05b5be5aaa78
 
         public void initServer()
         {
@@ -77,10 +76,10 @@ namespace EjercicioAfondamento
             try
             {
                 s.Bind(ie);
-                Console.WriteLine($"Puerto {ie.Port} libre");
-
                 s.Listen(10);
-                Console.WriteLine($"Se ha iniciado el servidor" + $" Escuchando en {ie.Address}:{ie.Port}");
+                WriteEvent($"Puerto {ie.Port} libre");
+
+
 
                 while (ServerRunning)
                 {
@@ -93,13 +92,27 @@ namespace EjercicioAfondamento
                 }
 
             }
-            catch (IndexOutOfRangeException)
-            {
-                Console.WriteLine("Puertos ocupados");
-            }
             catch (SocketException e) when (e.ErrorCode == 10048)
             {
-                Console.WriteLine($"Puerto {Port} en uso");
+                WriteEvent($"El puerto {Port} esta ocupado");
+                try
+                {
+                    s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    ie = new IPEndPoint(IPAddress.Any, puertoDefecto);
+                    s.Bind(ie);
+                    s.Listen(10);
+                    WriteEvent($"El puerto por defecto {puertoDefecto} esta libre");
+                   
+
+
+                }
+                catch (SocketException e2) when (e2.ErrorCode == 10048)
+                {
+                    WriteEvent($"Todos los puertos asignados estan ocupados");
+                    StopServer();
+
+
+                }
 
             }
             catch (SocketException)
@@ -131,76 +144,35 @@ namespace EjercicioAfondamento
                         try
                         {
                             opcion = sr.ReadLine();
-                            if (opcion != null && (opcion == "close" || opcion.StartsWith("close ")))
+                            if (opcion != null)
                             {
-                                string programData = Environment.GetEnvironmentVariable("PROGRAMDATA");
-                                string archivo = "password.txt";
-                                string rutaArchivo = programData + "\\" + archivo;
-                                string contraseñaCorrecta;
-                                try
+                                string formato = $"[{DateTime.Now.ToString("G")}-@{ieClient.Address}] {opcion}";
+                                guardarComandos(formato);
+
+                                if (opcion != "time" && opcion != "date" && opcion != "all")
                                 {
-                                    using (StreamReader sr2 = new StreamReader(rutaArchivo))
+                                    sw.WriteLine("El comando no es valido");
+                                }
+                                else
+                                {
+                                    switch (opcion)
                                     {
-                                        contraseñaCorrecta = sr2.ReadLine().Trim();
+                                        case "time":
+                                            sw.WriteLine(DateTime.Now.ToString("T"));
 
+                                            break;
+                                        case "date":
+                                            sw.WriteLine(DateTime.Now.ToString("d"));
+
+                                            break;
+
+                                        case "all":
+                                            sw.WriteLine(DateTime.Now.ToString("G"));
+
+                                            break;
                                     }
-                                    string[] contraseña = opcion.Split(' ');
 
-                                    if (contraseña.Length < 2)
-                                    {
-                                        sw.WriteLine("No se ha enviado la contrasenha");
-                                    }
-                                    else if (contraseña[1] != contraseñaCorrecta)
-                                    {
-                                        sw.WriteLine("La contrasenha es incorrecta");
-
-                                    }
-                                    else
-                                    {
-                                        sw.WriteLine("Contrasenha Correcta");
-                                       
-                                    }
                                 }
-                                catch (FileNotFoundException e)
-                                {
-                                    sw.WriteLine($"No se encontro el archivo: '{e}'");
-                                }
-                                catch (UnauthorizedAccessException e)
-                                {
-                                    sw.WriteLine($"No tienes los permisos necesarios: '{e}'");
-                                }
-                                catch (DirectoryNotFoundException e)
-                                {
-                                    sw.WriteLine($"No se pudo encontrar el directorio: '{e}'");
-                                }
-                                catch (IOException e)
-                                {
-                                    sw.WriteLine($"No se pudo abrir el archivo: '{e}'");
-                                }
-                            }
-                            else if (opcion != "time" && opcion != "date" && opcion != "all")
-                            {
-                                sw.WriteLine("El comando no es valido");
-                            }
-                            else
-                            {
-                                switch (opcion)
-                                {
-                                    case "time":
-                                        sw.WriteLine(DateTime.Now.ToString("T"));
-
-                                        break;
-                                    case "date":
-                                        sw.WriteLine(DateTime.Now.ToString("d"));
-
-                                        break;
-
-                                    case "all":
-                                        sw.WriteLine(DateTime.Now.ToString("G"));
-
-                                        break;
-                                }
-
                             }
                         }
 
@@ -213,8 +185,7 @@ namespace EjercicioAfondamento
                 }
             }
         }
-<<<<<<< HEAD
-=======
+
 
         public void StopServer()
         {
@@ -282,17 +253,17 @@ namespace EjercicioAfondamento
             string rutaArchivo = programData + "\\" + archivo;
             try
             {
-                using (StreamWriter sw = new StreamWriter(rutaArchivo))
+                using (StreamWriter sw = new StreamWriter(rutaArchivo,true))
                 {
                     sw.WriteLine(mensaje);
                 }
             }
-            catch (FileNotFoundException)
+            catch (Exception)
             {
 
             }
         }
->>>>>>> e542848d405e8d351c028364ab3d05b5be5aaa78
+
     }
 }
 
