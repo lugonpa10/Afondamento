@@ -102,7 +102,17 @@ namespace EjercicioAfondamento
                     s.Bind(ie);
                     s.Listen(10);
                     WriteEvent($"El puerto por defecto {puertoDefecto} esta libre");
-                   
+
+                    while (ServerRunning)
+                    {
+                        Socket client = s.Accept();
+                        Thread hilo = new Thread(() => ClientDispatcher(client));
+                        hilo.IsBackground = true;
+                        hilo.Start();
+
+
+                    }
+
 
 
                 }
