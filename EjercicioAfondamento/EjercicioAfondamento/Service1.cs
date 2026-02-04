@@ -48,7 +48,7 @@ namespace EjercicioAfondamento
 
         }
 
-       
+
         public bool ServerRunning { set; get; } = true;
         public int Port { set; get; } = 135;
         public int[] puertosAlternativos = { 135, 135, 135, 31416 };
@@ -126,7 +126,7 @@ namespace EjercicioAfondamento
                 {
                     sw.AutoFlush = true;
 
-                    string? opcion = "";
+                    string opcion = "";
                     sw.WriteLine("Bienvenido a mi servidor,introduce un comando");
                     {
                         try
@@ -145,7 +145,7 @@ namespace EjercicioAfondamento
                                         contraseñaCorrecta = sr2.ReadLine().Trim();
 
                                     }
-                                    string[] contraseña = opcion.Split(" ");
+                                    string[] contraseña = opcion.Split(' ');
 
                                     if (contraseña.Length < 2)
                                     {
@@ -159,7 +159,7 @@ namespace EjercicioAfondamento
                                     else
                                     {
                                         sw.WriteLine("Contrasenha Correcta");
-                                        StopServer();
+                                       
                                     }
                                 }
                                 catch (FileNotFoundException e)
@@ -215,5 +215,5 @@ namespace EjercicioAfondamento
             }
         }
     }
-    }
 }
+
